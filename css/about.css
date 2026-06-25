@@ -1,0 +1,124 @@
+/* ===== ABOUT PAGE ===== */
+
+/* Mission */
+.mission { background: var(--navy); }
+.mission-inner { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 80px; align-items: center; }
+.mission-left .section-tag { margin-bottom: 16px; }
+.mission-left h2 { font-size: clamp(2rem, 3.5vw, 2.6rem); font-weight: 800; line-height: 1.2; margin-bottom: 20px; }
+.mission-left p { color: var(--text-muted); margin-bottom: 16px; line-height: 1.7; font-size: 1.02rem; }
+.mission-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 32px; }
+.m-stat {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm); padding: 20px 12px; text-align: center;
+  transition: var(--transition);
+}
+.m-stat:hover { border-color: rgba(0,200,255,0.3); transform: translateY(-2px); }
+.m-stat-num { font-size: 1.8rem; font-weight: 900; color: #fff; }
+.m-stat-num span { color: var(--teal); }
+.m-stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+
+.mission-visual {
+  position: relative; width: 100%; padding-bottom: 100%;
+}
+.mv-orb {
+  position: absolute; border-radius: 50%; opacity: 0.15;
+  animation: drift 10s ease-in-out infinite alternate;
+}
+.mv-orb1 { width: 200px; height: 200px; background: var(--blue); top: 10%; left: 0; }
+.mv-orb2 { width: 160px; height: 160px; background: var(--teal); bottom: 10%; right: 10%; animation-delay: 3s; }
+.mv-center {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  text-align: center;
+}
+.mv-ring {
+  width: 120px; height: 120px; border-radius: 50%;
+  border: 3px solid rgba(0,200,255,0.3); display: flex;
+  align-items: center; justify-content: center; margin: 0 auto 16px;
+  animation: pulse-ring 3s ease-in-out infinite;
+  background: rgba(0,200,255,0.05);
+}
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,200,255,0.2); }
+  50% { box-shadow: 0 0 0 20px rgba(0,200,255,0); }
+}
+.mv-icon { font-size: 3rem; }
+.mv-label { color: var(--text-light); font-weight: 700; font-size: 1rem; }
+
+/* Why Us Grid */
+.why-us { background: var(--navy2); }
+.why-us-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.about-feature-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: var(--radius); padding: 32px 24px; text-align: center;
+  transition: var(--transition); position: relative; overflow: hidden;
+}
+.about-feature-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 3px; background: var(--grad); opacity: 0; transition: opacity 0.3s;
+}
+.about-feature-card:hover {
+  transform: translateY(-6px); border-color: rgba(0,200,255,0.35);
+  box-shadow: var(--shadow);
+}
+.about-feature-card:hover::after { opacity: 1; }
+.afc-icon { font-size: 2.2rem; margin-bottom: 16px; }
+.about-feature-card h3 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.about-feature-card p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.6; }
+
+/* Key Facts */
+.key-facts { background: var(--navy); }
+.facts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.fact-card {
+  background: var(--glass); border: 1px solid var(--glass-border);
+  border-radius: var(--radius); padding: 40px 24px; text-align: center;
+  transition: var(--transition);
+}
+.fact-card:hover { transform: translateY(-4px); border-color: rgba(0,200,255,0.3); }
+.fact-card.highlight-fact {
+  background: linear-gradient(135deg, rgba(0,105,255,0.12), rgba(0,200,255,0.06));
+  border-color: rgba(0,200,255,0.25);
+}
+.fact-num {
+  font-size: 3.5rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 12px;
+}
+.fact-num span { color: var(--teal); }
+.fact-card p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .mission-inner { grid-template-columns: 1fr; gap: 40px; }
+  .mission-visual { max-width: 320px; margin: 0 auto; }
+  .why-us-grid { grid-template-columns: repeat(2, 1fr); }
+  .facts-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .mission { padding: 60px 0; }
+  .mission-left h2 { font-size: 1.6rem; }
+  .mission-left p { font-size: 0.95rem; }
+  .mission-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .m-stat { padding: 16px 10px; }
+  .m-stat-num { font-size: 1.5rem; }
+  .m-stat-label { font-size: 0.7rem; }
+
+  .why-us { padding: 60px 0; }
+  .why-us-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .about-feature-card { padding: 20px 16px; }
+  .about-feature-card h3 { font-size: 0.9rem; }
+  .about-feature-card p { font-size: 0.8rem; }
+  .afc-icon { font-size: 1.8rem; }
+
+  .key-facts { padding: 60px 0; }
+  .facts-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+  .fact-card { padding: 24px 16px; }
+  .fact-num { font-size: 2.5rem; }
+  .fact-card p { font-size: 0.85rem; }
+}
+@media (max-width: 480px) {
+  .mission-stats { grid-template-columns: 1fr; }
+  .why-us-grid { grid-template-columns: 1fr; }
+  .facts-grid { grid-template-columns: 1fr; }
+  .mission-left { text-align: center; }
+  .about-feature-card { padding: 20px 14px; }
+  .fact-card { padding: 20px 14px; }
+  .fact-num { font-size: 2rem; }
+}

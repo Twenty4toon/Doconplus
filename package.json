@@ -1,0 +1,7 @@
+{
+  "name": "doconplus",
+  "private": true,
+  "dependencies": {
+    "nodemailer": "^6.9"
+  }
+}
