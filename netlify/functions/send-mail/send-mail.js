@@ -34,8 +34,8 @@ exports.handler = async (event) => {
   const service = params.get('formService') || '';
   const msg     = params.get('formMessage') || '';
 
-  if (!name || !phone) {
-    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Name and phone are required' }) };
+  if (!name || !phone || !email) {
+    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Name, phone, and email are required' }) };
   }
 
   const fields = [
