@@ -83,6 +83,7 @@ revealSelectors.forEach(sel => {
   document.querySelectorAll(sel).forEach((el, i) => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(24px)';
+    el.style.willChange = 'transform, opacity';
     el.style.transition = `opacity 0.6s ease ${i * 0.06}s, transform 0.6s ease ${i * 0.06}s`;
     revealObserver.observe(el);
   });
