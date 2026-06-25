@@ -94,7 +94,7 @@
 @media (max-width: 768px) {
   .mission { padding: 60px 0; }
   .mission-left h2 { font-size: 1.6rem; }
-  .mission-left p { font-size: 0.95rem; }
+  .mission-left p { font-size: 1.15rem; }
   .mission-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .m-stat { padding: 16px 10px; }
   .m-stat-num { font-size: 1.5rem; }
