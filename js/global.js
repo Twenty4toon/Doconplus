@@ -120,7 +120,12 @@ if (form) {
     btn.textContent = 'Sending...';
     btn.disabled = true;
     try {
-      const res = await fetch('/.netlify/functions/send-mail', { method: 'POST', body: new FormData(form) });
+      const fd = new FormData(form);
+      const res = await fetch('/.netlify/functions/send-mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(fd).toString(),
+      });
       const data = await res.json();
       if (data.ok) {
         showToast('Thank you! Your enquiry has been sent. We\'ll call you back within 2 hours.');

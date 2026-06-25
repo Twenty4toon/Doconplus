@@ -6,13 +6,24 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: 'doconplus@gmail.com',
-    pass: 'lkmx rjox zbgj zytn',
+    pass: 'lkmxrjoxzbgjzytn',
   },
 });
 
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Content-Type': 'application/json',
+};
+
 exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ ok: false, error: 'Method not allowed' }) };
+    return { statusCode: 405, headers, body: JSON.stringify({ ok: false, error: 'Method not allowed' }) };
   }
 
   const params = new URLSearchParams(event.body);
@@ -24,7 +35,7 @@ exports.handler = async (event) => {
   const msg     = params.get('formMessage') || '';
 
   if (!name || !phone) {
-    return { statusCode: 400, body: JSON.stringify({ ok: false, error: 'Name and phone are required' }) };
+    return { statusCode: 400, headers, body: JSON.stringify({ ok: false, error: 'Name and phone are required' }) };
   }
 
   const fields = [
@@ -56,8 +67,8 @@ exports.handler = async (event) => {
       subject: `New Consultation Request - ${name}`,
       html,
     });
-    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
+    return { statusCode: 200, headers, body: JSON.stringify({ ok: true }) };
   } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ ok: false, error: err.message }) };
+    return { statusCode: 500, headers, body: JSON.stringify({ ok: false, error: err.message }) };
   }
 };
