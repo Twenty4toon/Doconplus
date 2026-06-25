@@ -83,11 +83,31 @@
 }
 @media (max-width: 768px) {
   .form-row { grid-template-columns: 1fr; }
-  .contact-form { padding: 28px 20px; }
+  .contact-form {
+    padding: 28px 20px;
+    background: #fff;
+    border-color: #e2e8f0;
+  }
+  .contact-form::before { display: none; }
+  .contact-form h3 { color: #1a202c; }
+  .form-group label { color: #4a5568; }
+  .form-group input, .form-group select, .form-group textarea {
+    background: #fff;
+    border-color: #cbd5e0;
+    color: #1a202c;
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: #a0aec0; }
+  .form-group select { color: #4a5568; }
+  .form-group select option { background: #fff; color: #1a202c; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--teal);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0,200,255,0.15);
+  }
 }
 @media (max-width: 480px) {
   .contact-form { padding: 24px 16px; border-radius: 16px; }
-  .contact-form h3 { font-size: 1.2rem; }
+  .contact-form h3 { font-size: 1.2rem; color: #1a202c; }
   .contact-info-item { padding: 12px 14px; }
   .contact-info-item a { font-size: 0.85rem; }
   .ci-text { font-size: 0.85rem; }
