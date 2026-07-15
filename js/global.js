@@ -155,10 +155,15 @@ function showToast(msg) {
 }
 
 /* ===== ACTIVE NAV HIGHLIGHT ===== */
-const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+const currentPath = window.location.pathname;
+const currentPage = currentPath.split('/').pop() || 'index.html';
+const isBlogPost = currentPath.includes('/blog/');
 document.querySelectorAll('.nav-links > li > a').forEach(a => {
   const href = a.getAttribute('href');
-  if (href === currentPage || (currentPage === '' && href === 'index.html')) {
+  const hrefPage = href.split('/').pop();
+  if (isBlogPost && hrefPage === 'blog.html') {
+    a.classList.add('active');
+  } else if (hrefPage === currentPage || (currentPage === '' && hrefPage === 'index.html')) {
     a.classList.add('active');
   }
 });
@@ -229,3 +234,24 @@ if (window.matchMedia("(pointer: fine)").matches && window.matchMedia("(hover: h
     }
   });
 }
+
+/* ===== TAP RIPPLE FOR MOBILE ===== */
+document.addEventListener('click', (e) => {
+  const isTouch = window.matchMedia('(pointer: coarse)').matches;
+  if (!isTouch) return;
+  const target = e.target.closest('a, button, .btn-primary, .btn-outline, .faq-q');
+  if (!target) return;
+  const ripple = document.createElement('span');
+  ripple.style.cssText = `
+    position: fixed; z-index: 99999; pointer-events: none;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(0,200,255,0.3);
+    left: ${e.clientX - 10}px; top: ${e.clientY - 10}px;
+    transform: scale(0); animation: rippleAnim 0.5s ease-out forwards;
+  `;
+  document.body.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 500);
+});
+const rippleStyle = document.createElement('style');
+rippleStyle.textContent = `@keyframes rippleAnim { to { transform: scale(3); opacity: 0; } }`;
+document.head.appendChild(rippleStyle);
