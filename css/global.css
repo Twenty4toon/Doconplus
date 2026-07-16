@@ -523,6 +523,9 @@ i.ph {
   .hero-stats { justify-content: center; }
   .section-header { padding: 0 16px; }
   .hero-float-card { transform: scale(0.85); }
+  .section { padding: 80px 0; }
+  .container { padding: 0 20px; }
+  .cool-bot-wrap { width: 120px; height: 120px; }
 }
 
 @media (max-width: 768px) {

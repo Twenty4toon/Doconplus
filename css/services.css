@@ -81,6 +81,8 @@
   .sd-inner, .sd-inner.reverse { grid-template-columns: 1fr; gap: 40px; }
   .sd-inner.reverse .sd-content { order: 1; }
   .sd-inner.reverse .sd-visual { order: 2; }
+  .sd-features { grid-template-columns: 1fr; }
+  .sd-content h2 { font-size: 1.6rem; }
 }
 @media (max-width: 768px) {
   .sd-features { grid-template-columns: 1fr; }

@@ -93,6 +93,10 @@
   .services-grid { grid-template-columns: repeat(2, 1fr); }
   .process-timeline { grid-template-columns: repeat(2, 1fr); gap: 20px; }
   .process-timeline::before { display: none; }
+  .section-header h2 { font-size: 2rem; }
+  .about-preview-left h2 { font-size: 1.8rem; }
+  .stat-num { font-size: 1.8rem; }
+  .why-digital-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
