@@ -1,6 +1,4 @@
-/* ===== HOME PAGE SPECIFIC ===== */
-
-/* About Preview */
+﻿/* About Preview */
 .about-preview { background: var(--navy2); }
 .about-preview-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
 .about-preview-left .section-tag { margin-bottom: 16px; }
@@ -235,7 +233,7 @@
   position: relative;
 }
 .flow-step::after {
-  content: '↓';
+  content: 'â†“';
   position: absolute;
   bottom: -20px;
   left: 40px;
