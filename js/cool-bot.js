@@ -21,6 +21,8 @@
   const MAX_TILT = 12;            // max degrees the bot leans while moving
   const EYE_PARALLAX = 10;        // px the artboard shifts to fake eye-follow
   const MOBILE_BREAK = 768;       // px width below which we use a tighter offset
+  const DESKTOP_TRAIL = 0.006;
+  const DESKTOP_EASE = 0.009;
 
   // ---- State ----
   let winW = window.innerWidth;
@@ -36,9 +38,26 @@
   let tiltTarget = 0;
   let eyeX = 0, eyeY = 0;       // eased parallax for eye-follow illusion
 
+  if (isMobile) {
+    target.x = winW * 0.5;
+    target.y = 40;
+    float.x = target.x; float.y = target.y;
+    pos.x = target.x; pos.y = target.y;
+  }
+
   let lastMouse = performance.now();
   let bobT = 0;
   let patrolT = Math.random() * Math.PI * 2;   // offset so bots don't sync
+
+  // ---- Mobile-only state ----
+  let isDragging = false;
+  let dragOffX = 0, dragOffY = 0;
+  let dragMoved = false;
+  let dragCooldown = 0;
+  const DRAG_COOLDOWN_MS = 3000;
+  let autoGazeT = 0;
+  let autoGazeX = 0, autoGazeY = 0;
+  let nextGazeChange = 3 + Math.random() * 3;
 
   // Rive inputs
   let rInstance = null;
@@ -90,14 +109,16 @@
   }
   startRive('State Machine');
 
-  // ---- Pointer tracking (works on desktop + mobile) ----
+  // ---- Pointer tracking (desktop only) ----
   function onMove(x, y) {
     lastMouse = performance.now();
-    // On mobile keep the bot a bit closer to the pointer so it doesn't cover
-    // the content the user is interacting with.
-    const off = isMobile ? 56 : 70;
-    target.x = clamp(x - off, off / 2 + MARGIN, winW - off / 2 - MARGIN);
-    target.y = clamp(y - off, off / 2 + MARGIN, winH - off / 2 - MARGIN);
+    if (isMobile) return;
+
+    if (!isDragging && performance.now() - dragCooldown > DRAG_COOLDOWN_MS) {
+      const off = 70;
+      target.x = clamp(x - off, off / 2 + MARGIN, winW - off / 2 - MARGIN);
+      target.y = clamp(y - off, off / 2 + MARGIN, winH - off / 2 - MARGIN);
+    }
 
     const dx = (x - float.x) / (winW * REACH);
     const dy = (y - float.y) / (winH * REACH);
@@ -107,7 +128,7 @@
 
   window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
   window.addEventListener('touchmove', (e) => {
-    if (e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY);
+    if (!isMobile && e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
 
   // ---- Speech bubble (minimal "Hi!" on bot tap/click) ----
@@ -132,6 +153,7 @@
     }, 2600);
   }
   function onBotTap(e) {
+    if (dragMoved) return;
     if (e) e.stopPropagation();
     wave();
     showBubble('Hi!');
@@ -143,7 +165,78 @@
   canvas.style.pointerEvents = 'auto';
   canvas.style.cursor = 'pointer';
   canvas.addEventListener('click', onBotTap);
-  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onBotTap(e); }, { passive: false });
+
+  if (isMobile) {
+    // Combined drag + tap for mobile
+    let touchStartX = 0, touchStartY = 0;
+
+    canvas.addEventListener('touchstart', (e) => {
+      const t = e.touches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+      dragMoved = false;
+      isDragging = true;
+      dragOffX = t.clientX - pos.x;
+      dragOffY = t.clientY - pos.y;
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - touchStartX) > 8 || Math.abs(t.clientY - touchStartY) > 8) {
+        dragMoved = true;
+      }
+      const nx = clamp(t.clientX - dragOffX, winW * 0.15, winW * 0.85);
+      const ny = clamp(t.clientY - dragOffY, 35, 60);
+      target.x = nx;
+      target.y = ny;
+      float.x = nx;
+      float.y = ny;
+      e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', () => {
+      isDragging = false;
+      if (!dragMoved) onBotTap();
+    });
+
+    canvas.addEventListener('touchcancel', () => { isDragging = false; });
+  } else {
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onBotTap(e); }, { passive: false });
+
+    // Desktop drag support
+    let mouseStartX = 0, mouseStartY = 0;
+
+    canvas.addEventListener('mousedown', (e) => {
+      mouseStartX = e.clientX;
+      mouseStartY = e.clientY;
+      dragMoved = false;
+      isDragging = true;
+      dragOffX = e.clientX - pos.x;
+      dragOffY = e.clientY - pos.y;
+      canvas.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      if (Math.abs(e.clientX - mouseStartX) > 8 || Math.abs(e.clientY - mouseStartY) > 8) {
+        dragMoved = true;
+      }
+      const nx = clamp(e.clientX - dragOffX, MARGIN + 50, winW - MARGIN - 50);
+      const ny = clamp(e.clientY - dragOffY, MARGIN + 50, winH - MARGIN - 50);
+      target.x = nx;
+      target.y = ny;
+      float.x = nx;
+      float.y = ny;
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (!isDragging) return;
+      isDragging = false;
+      dragCooldown = performance.now();
+      canvas.style.cursor = 'pointer';
+    });
+  }
 
   window.addEventListener('resize', () => {
     winW = window.innerWidth;
@@ -160,10 +253,28 @@
     // Smooth floating follow (desktop AND mobile): "float" lags behind the
     // pointer target, the bot eases toward that floating point. Trails
     // naturally instead of snapping to the cursor.
-    float.x += (target.x - float.x) * FLOAT_TRAIL;
-    float.y += (target.y - float.y) * FLOAT_TRAIL;
-    pos.x += (float.x - pos.x) * FOLLOW_EASE;
-    pos.y += (float.y - pos.y) * FOLLOW_EASE;
+    const trail = isMobile ? FLOAT_TRAIL : DESKTOP_TRAIL;
+    const ease = isMobile ? FOLLOW_EASE : DESKTOP_EASE;
+    float.x += (target.x - float.x) * trail;
+    float.y += (target.y - float.y) * trail;
+    pos.x += (float.x - pos.x) * ease;
+    pos.y += (float.y - pos.y) * ease;
+
+    // ---- Mobile: drift between logo and hamburger in navbar ----
+    if (isMobile && !isDragging) {
+      target.x += (winW * 0.5 + Math.sin(patrolT * 0.4) * 20 - target.x) * 0.008;
+      target.x = clamp(target.x, winW * 0.28, winW * 0.72);
+
+      autoGazeT += 0.016;
+      if (autoGazeT > nextGazeChange) {
+        autoGazeT = 0;
+        nextGazeChange = 2 + Math.random() * 4;
+        autoGazeX = (Math.random() - 0.5) * 1.2;
+        autoGazeY = (Math.random() - 0.5) * 0.8;
+      }
+      lookTarget.x += (autoGazeX - lookTarget.x) * 0.015;
+      lookTarget.y += (autoGazeY - lookTarget.y) * 0.015;
+    }
 
     // Ease eyes/head direction.
     look.x += (lookTarget.x - look.x) * LOOK_EASE;
@@ -175,7 +286,7 @@
     canvas.style.transform = `translate(${eyeX.toFixed(2)}px, ${eyeY.toFixed(2)}px)`;
 
     // Idle bobbing + drift (calmed when reduced motion is preferred).
-    const amp = reduceMotion ? FLOAT_AMPLITUDE * 0.3 : FLOAT_AMPLITUDE;
+    const amp = reduceMotion ? FLOAT_AMPLITUDE * 0.3 : (isMobile ? FLOAT_AMPLITUDE * 0.35 : FLOAT_AMPLITUDE);
     const bob = Math.sin(bobT * 1.4) * amp;
     const driftX = reduceMotion ? 0 : (isMobile ? 0 : Math.sin(bobT * 0.6) * 10);
 
@@ -191,8 +302,8 @@
     wrap.style.top = cy.toFixed(2) + 'px';
     wrap.style.transform = `translate(-50%, -50%) rotate(${tilt.toFixed(2)}deg)`;
 
-    // Relax the look toward center when the pointer is idle.
-    if (performance.now() - lastMouse > 1200) {
+    // Relax the look toward center when the pointer is idle (desktop only).
+    if (!isMobile && performance.now() - lastMouse > 1200) {
       lookTarget.x += (0 - lookTarget.x) * 0.05;
       lookTarget.y += (0 - lookTarget.y) * 0.05;
     }
