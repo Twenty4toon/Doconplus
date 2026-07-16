@@ -762,17 +762,5 @@ body:hover .custom-cursor-circle {
 /* On phones the bot is small and patrols the bottom edge (set from JS) so it
    flies above the text instead of lingering over it. */
 @media (max-width: 768px) {
-  .cool-bot-wrap { width: 100px; height: 100px; z-index: 1001; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.15)); }
-  .cool-bot-bubble {
-    top: 50%; left: 100%; right: auto;
-    transform: translate(0px, -50%) scale(0.8);
-    border-radius: 14px 14px 14px 14px;
-  }
-  .cool-bot-bubble.show { transform: translate(2px, -50%) scale(1); }
-  .cool-bot-bubble::after {
-    bottom: auto; top: 50%; left: -5px; right: auto;
-    border-width: 6px 6px 6px 0;
-    border-color: transparent #fff transparent transparent;
-    transform: translateY(-50%);
-  }
+  .cool-bot-wrap { display: none; }
 }
