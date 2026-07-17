@@ -1,8 +1,8 @@
 /* =========================================================
-   Docon+ — Floating Rive "Cool" Bot
+   Docon+ — Floating Rive "Cool" Bot with Q&A Chat
    - Smoothly floats across the page (stays ABOVE content)
    - Head, eyes & whole body lean toward the cursor/pointer
-   - Tap/click the bot -> waves (Chat state) + a minimal "Hi!" bubble
+   - Tap/click the bot -> opens interactive Q&A chat panel
    - Both desktop and mobile: the bot follows the pointer.
    ========================================================= */
 
@@ -10,6 +10,52 @@
   const wrap = document.getElementById('coolBotWrap');
   const canvas = document.getElementById('coolBotCanvas');
   if (!wrap || !canvas || typeof rive === 'undefined') return;
+
+  // ---- Q&A Dataset (Docon+ specific) ----
+  const botQA = [
+    { q: "What services does Docon+ offer?", a: "Docon+ offers complete healthcare digital marketing including SEO, social media management, custom website design, Google Business Profile optimization, and personal branding for doctors and clinics." },
+    { q: "How much do your services cost?", a: "Our pricing is customized based on your practice size, goals, and service scope. We offer packages starting from affordable monthly retainers. Book a free consultation and we will create a tailored quote for you." },
+    { q: "How can I contact you?", a: "You can reach us at +91 9597374221, email us at doconplus@gmail.com, or use the contact form on our website. We are also available on WhatsApp \u2014 just click the green icon on this page!" },
+    { q: "What industries do you serve?", a: "We specialize in healthcare \u2014 serving doctors, dentists, dermatologists, orthopedic surgeons, clinics, hospitals, and wellness centers across India and globally." },
+    { q: "Do you offer SEO for healthcare websites?", a: "Absolutely! Our healthcare SEO includes local SEO (Google Maps ranking), on-page optimization, technical SEO, content strategy (blogs, service pages), and reputation management to help patients find you online." },
+    { q: "Can I see some case studies?", a: "Yes! Visit our Case Studies page to see real results we have delivered for healthcare clients \u2014 including increased website traffic, higher patient inquiries, and improved search rankings." },
+    { q: "How long does it take to see results?", a: "It depends on the service. SEO typically shows meaningful improvements in 3\u20136 months. Social media growth can be seen in 1\u20133 months. Website design takes 2\u20134 weeks. We set clear timelines during onboarding." },
+    { q: "Do you offer website design?", a: "Yes, we design custom healthcare websites that are patient-friendly, mobile-optimized, and conversion-focused. Features include online booking, telemedicine integration, service pages, doctor profiles, and more." },
+    { q: "What makes Docon+ different?", a: "We are 100% healthcare-focused. Unlike general agencies, we understand patient behavior, medical compliance, and what actually drives appointments. Every strategy is data-driven and tailored to your specialty." },
+    { q: "How do I get started?", a: "Getting started is easy! Click the Get a Free Consultation button on this page, fill out our contact form, or WhatsApp us. We will schedule a call to understand your practice and create a custom plan." },
+    { q: "What is included in healthcare SEO?", a: "Healthcare SEO includes on-page optimization, technical SEO, local SEO & Google Maps ranking, voice search optimization, Practo & Lybrate profile optimization, keyword research, and patient-focused content strategy." },
+    { q: "Do you manage social media for doctors?", a: "Yes! We manage Instagram, Facebook, and YouTube for healthcare professionals \u2014 including educational reels, patient engagement, community building, and monthly performance analytics." },
+    { q: "Do you run Google Ads for clinics?", a: "Absolutely! We run Google Search & Display campaigns, Facebook & Instagram ads with treatment-specific targeting, retargeting, budget optimization, and detailed ROAS tracking." },
+    { q: "What is online reputation management?", a: "Our ORM includes Google Review management, negative response strategy, patient feedback systems, GBP optimization, and trust badge display to protect and enhance your online image." },
+    { q: "Do you offer WhatsApp automation?", a: "Yes! Our WhatsApp automation handles 24/7 appointment booking, follow-up reminders, FAQ bot, automated review requests, EMR & calendar sync, and broadcast health campaigns." },
+    { q: "What patient lead generation do you offer?", a: "We build high-converting landing pages, run Google & Meta lead ads, do A/B testing with conversion tracking, integrate WhatsApp & call tracking, and deliver monthly ROI reports." },
+    { q: "Do you offer content and video production?", a: "Yes! Professional clinic video shoots, YouTube content strategy, blog writing, patient guides, commercial ad production, and social media creative design are all part of our services." },
+    { q: "Do you offer personal branding for doctors?", a: "Yes \u2014 we build your brand identity with logo design, thought leadership content, LinkedIn optimization, speaking opportunity outreach, and specialty authority positioning." },
+    { q: "Where are you based and who do you serve?", a: "We are based in India and serve healthcare professionals pan-India and globally \u2014 including doctors, clinics, hospitals, dental practices, and diagnostic labs." },
+    { q: "Do you guarantee results?", a: "We set transparent, data-driven expectations. Campaigns launch in 7 days, SEO improvements show in 90 days, and we provide monthly reports tracking real patient inquiries, not vanity metrics." },
+    { q: "What is your process?", a: "Our 4-step growth system: 1) Digital Audit of your current presence, 2) Custom Strategy Blueprint, 3) Implementation & launch, 4) Ongoing optimization and scaling." },
+    { q: "Is there a free consultation?", a: "Yes! We offer a free 30-minute strategy call with no obligations. We will analyze your practice and provide a clear roadmap to grow \u2014 completely free." },
+    { q: "What social proof do you have?", a: "We are trusted by 500+ doctors, maintain a 4.9-star Google rating, serve 50+ cities across India, and are rated as India's top healthcare marketing agency." },
+    { q: "Do you offer clinic photography?", a: "Yes, we provide professional doctor portraits, clinic interior shoots, doctor-patient interaction photography, and high-quality B-roll footage for video reels." },
+    { q: "How fast can campaigns launch?", a: "Most campaigns launch within 7 days. SEO results become visible within 90 days, while social media and ad campaigns can generate leads within the first few weeks." },
+    { q: "price?", a: "Our pricing is customized based on your practice size, goals, and service scope. We offer packages starting from affordable monthly retainers. Book a free consultation and we will create a tailored quote for you." },
+    { q: "cost?", a: "Our pricing is customized based on your practice size, goals, and service scope. We offer packages starting from affordable monthly retainers. Book a free consultation and we will create a tailored quote for you." },
+    { q: "rates?", a: "Our pricing is customized based on your practice size, goals, and service scope. We offer packages starting from affordable monthly retainers. Book a free consultation and we will create a tailored quote for you." },
+    { q: "packages?", a: "Our pricing is customized based on your practice size, goals, and service scope. We offer packages starting from affordable monthly retainers. Book a free consultation and we will create a tailored quote for you." },
+    { q: "fees?", a: "Our pricing is customized based on your practice size, goals, and service scope. We offer packages starting from affordable monthly retainers. Book a free consultation and we will create a tailored quote for you." },
+    { q: "email?", a: "You can reach us at +91 9597374221, email us at doconplus@gmail.com, or use the contact form on our website." },
+    { q: "phone?", a: "You can reach us at +91 9597374221, email us at doconplus@gmail.com, or use the contact form on our website." },
+    { q: "support?", a: "You can reach us at +91 9597374221, email us at doconplus@gmail.com, or use the contact form on our website." },
+    { q: "help?", a: "You can reach us at +91 9597374221, email us at doconplus@gmail.com, or use the contact form on our website." },
+    { q: "branding?", a: "We build your brand identity with logo design, thought leadership content, LinkedIn optimization, speaking opportunity outreach, and specialty authority positioning." },
+    { q: "leads?", a: "We build high-converting landing pages, run Google & Meta lead ads, do A/B testing with conversion tracking, integrate WhatsApp & call tracking, and deliver monthly ROI reports." },
+    { q: "portfolio?", a: "Visit our Case Studies page to see real results we have delivered for healthcare clients \u2014 including increased website traffic, higher patient inquiries, and improved search rankings." },
+    { q: "examples?", a: "Visit our Case Studies page to see real results we have delivered for healthcare clients \u2014 including increased website traffic, higher patient inquiries, and improved search rankings." },
+    { q: "guarantee?", a: "We set transparent, data-driven expectations. Campaigns launch in 7 days, SEO improvements show in 90 days, and we provide monthly reports tracking real patient inquiries, not vanity metrics." },
+    { q: "work?", a: "Our 4-step growth system: 1) Digital Audit of your current presence, 2) Custom Strategy Blueprint, 3) Implementation & launch, 4) Ongoing optimization and scaling." },
+    { q: "turnaround?", a: "Most campaigns launch within 7 days. SEO results become visible within 90 days, while social media and ad campaigns can generate leads within the first few weeks." },
+    { q: "compliance?", a: "We are 100% healthcare-focused and fully compliant with NMC and MCI guidelines. All marketing strategies are ethical, patient-centric, and regulation-friendly." }
+  ];
 
   // ---- Tuning ----
   const FLOAT_AMPLITUDE = 14;     // px idle bobbing
@@ -110,11 +156,13 @@
   startRive('State Machine');
 
   // ---- Pointer tracking (desktop only) ----
+  let docked = false;
   function onMove(x, y) {
     lastMouse = performance.now();
     if (isMobile) return;
 
-    if (!isDragging && performance.now() - dragCooldown > DRAG_COOLDOWN_MS) {
+    // When docked, skip cursor position tracking (bot stays near chat) but keep look direction
+    if (!docked && !isDragging && performance.now() - dragCooldown > DRAG_COOLDOWN_MS) {
       const off = 70;
       target.x = clamp(x - off, off / 2 + MARGIN, winW - off / 2 - MARGIN);
       target.y = clamp(y - off, off / 2 + MARGIN, winH - off / 2 - MARGIN);
@@ -131,19 +179,12 @@
     if (!isMobile && e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY);
   }, { passive: true });
 
-  // ---- Speech bubble (minimal "Hi!" on bot tap/click) ----
-  const bubble = document.createElement('div');
-  bubble.className = 'cool-bot-bubble';
-  bubble.textContent = 'Hi!';
-  wrap.appendChild(bubble);
-  let bubbleTimer = null;
+  // ---- Chat Panel with Text Input ----
+  let chatOpen = false;
+  let chatPanel = null;
+  let chatMessages = null;
+  let chatInputEl = null;
   let waveTimer = null;
-  function showBubble(msg) {
-    bubble.textContent = msg;
-    bubble.classList.add('show');
-    clearTimeout(bubbleTimer);
-    bubbleTimer = setTimeout(() => bubble.classList.remove('show'), 2200);
-  }
   function wave() {
     if (chatInput) { try { chatInput.value = true; } catch (e) {} }
     clearTimeout(waveTimer);
@@ -152,11 +193,182 @@
       if (resetInput) { try { resetInput.fire(); } catch (e) {} }
     }, 2600);
   }
+  function findBestMatch(input) {
+    var lower = input.toLowerCase().trim();
+    if (!lower) return null;
+    if (/^(hi|hello|hey|yo|sup|howdy|heya|namaste|namaskar|ok|okay|k|kk|alright|sure|hmm|hlo|helo|hellow|good\s*(morning|afternoon|evening|day)|how\s*(are\s*you|is\s*it\s*going)|whats\s*up|what's up)$/.test(lower) || /^(hi|hello|hey)\b/.test(lower)) {
+      return "Hi there! \uD83D\uDC4B How can I help you today? Ask me about our services, pricing, SEO, website design, or anything about Docon+!";
+    }
+    if (/\b(thanks|thank you|thx|ty|thnk|thnks|thank u|cheers|appreciate|much appreciated|thanks a lot)\b/.test(lower)) {
+      return "You're welcome! \uD83D\uDE0A Feel free to ask if anything else comes to mind.";
+    }
+    if (/\b(bye|goodbye|see you|talk later|catch you later|see ya|later|take care|tc|gtg|gotta go)\b/.test(lower)) {
+      return "Goodbye! \uD83D\uDC4B Don't hesitate to reach out anytime. Have a great day!";
+    }
+    var words = lower.split(/\s+/).filter(function (w) { return w.length > 2; });
+    if (words.length === 0) {
+      return "I'm not sure about that. For specific questions, contact us at doconplus@gmail.com or call +91 9597374221!";
+    }
+    var bestScore = 0;
+    var bestAnswer = null;
+    for (var i = 0; i < botQA.length; i++) {
+      var item = botQA[i];
+      var score = 0;
+      for (var j = 0; j < words.length; j++) {
+        if (item.q.toLowerCase().indexOf(words[j]) !== -1) score += 2;
+        if (item.a.toLowerCase().indexOf(words[j]) !== -1) score += 1;
+      }
+      if (score > bestScore) { bestScore = score; bestAnswer = item.a; }
+    }
+    if (bestScore > 0) return bestAnswer;
+    return "I'm not sure about that. For personalized help, email us at doconplus@gmail.com or call +91 9597374221. You can also ask about services, pricing, or SEO!";
+  }
+  function buildChatPanel() {
+    if (chatPanel) return;
+    chatPanel = document.createElement('div');
+    chatPanel.className = 'cool-bot-chat-panel';
+    var header = document.createElement('div');
+    header.className = 'cool-bot-chat-header';
+    var title = document.createElement('span');
+    title.className = 'cool-bot-chat-title';
+    title.textContent = '\u2726 Docon+ Bot';
+    header.appendChild(title);
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'cool-bot-chat-close';
+    closeBtn.innerHTML = '\u00d7';
+    closeBtn.setAttribute('aria-label', 'Close chat');
+    closeBtn.addEventListener('click', function (ce) { ce.stopPropagation(); closeChat(); });
+    header.appendChild(closeBtn);
+    chatPanel.appendChild(header);
+    var body = document.createElement('div');
+    body.className = 'cool-bot-chat-body';
+    chatMessages = document.createElement('div');
+    chatMessages.className = 'cool-bot-chat-messages';
+    body.appendChild(chatMessages);
+    var inputRow = document.createElement('div');
+    inputRow.className = 'cool-bot-chat-input-row';
+    chatInputEl = document.createElement('input');
+    chatInputEl.className = 'cool-bot-chat-input';
+    chatInputEl.type = 'text';
+    chatInputEl.placeholder = 'Type a message...';
+    chatInputEl.setAttribute('autocomplete', 'off');
+    inputRow.appendChild(chatInputEl);
+    var sendBtn = document.createElement('button');
+    sendBtn.className = 'cool-bot-chat-send';
+    sendBtn.setAttribute('aria-label', 'Send message');
+    sendBtn.innerHTML = '\u27A4';
+    inputRow.appendChild(sendBtn);
+    body.appendChild(inputRow);
+    chatPanel.appendChild(body);
+    document.body.appendChild(chatPanel);
+    function onSend() {
+      var text = chatInputEl.value.trim();
+      if (!text) return;
+      chatInputEl.value = '';
+      handleUserInput(text);
+    }
+    chatInputEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); onSend(); }
+    });
+    sendBtn.addEventListener('click', onSend);
+  }
+  function addBotMessage(text) {
+    if (!chatMessages) return;
+    var msg = document.createElement('div');
+    msg.className = 'cool-bot-msg cool-bot-msg-bot';
+    msg.textContent = text;
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  function addUserMessage(text) {
+    if (!chatMessages) return;
+    var msg = document.createElement('div');
+    msg.className = 'cool-bot-msg cool-bot-msg-user';
+    msg.textContent = text;
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  function addSuggestionChip() {
+    if (!chatMessages) return;
+    var prev = chatMessages.querySelectorAll('.cool-bot-suggestion-chip');
+    for (var s = 0; s < prev.length; s++) { prev[s].remove(); }
+    var idx = Math.floor(Math.random() * botQA.length);
+    var qText = botQA[idx].q;
+    var chip = document.createElement('button');
+    chip.className = 'cool-bot-suggestion-chip';
+    chip.textContent = '\uD83D\uDCAC ' + qText;
+    chip.addEventListener('click', function () {
+      var text = qText;
+      chatInputEl.value = '';
+      handleUserInput(text);
+    });
+    chatMessages.appendChild(chip);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+  function handleUserInput(text) {
+    addUserMessage(text);
+    window.setTimeout(function () {
+      var answer = findBestMatch(text);
+      if (answer) addBotMessage(answer);
+      wave();
+      addSuggestionChip();
+      if (chatInputEl) chatInputEl.focus();
+    }, 400);
+  }
+  function dockBot() {
+    docked = true;
+    if (!chatPanel) return;
+    var pr = chatPanel.getBoundingClientRect();
+    target.x = clamp(pr.right + 30, 120, winW - 120);
+    target.y = clamp(pr.top + pr.height / 2, 120, winH - 120);
+  }
+  function undockBot() {
+    docked = false;
+  }
+  function openChat() {
+    if (isMobile) return;
+    buildChatPanel();
+    if (chatOpen) return;
+    chatOpen = true;
+    var br = wrap.getBoundingClientRect();
+    var pw = 320;
+    var ph = 440;
+    var pl = br.left - pw - 16;
+    var pt = br.top + br.height / 2 - ph / 2;
+    if (pl < 12) {
+      pl = br.right + 16;
+      pt = br.top + br.height / 2 - ph / 2;
+    }
+    if (pl + pw > winW - 12) {
+      pl = clamp(br.left + br.width / 2 - pw / 2, 12, winW - pw - 12);
+      pt = br.top - ph - 16;
+      if (pt < 12) { pt = br.bottom + 16; }
+    }
+    pt = clamp(pt, 12, winH - ph - 12);
+    pl = clamp(pl, 12, winW - pw - 12);
+    chatPanel.style.left = pl + 'px';
+    chatPanel.style.top = pt + 'px';
+    chatPanel.classList.add('open');
+    dockBot();
+    if (chatMessages.children.length === 0) {
+      addBotMessage("Hey there! \uD83D\uDC4B I'm the Docon+ assistant. Ask me anything about Docon+!");
+      addSuggestionChip();
+    }
+    wave();
+    window.setTimeout(function () { if (chatInputEl) chatInputEl.focus(); }, 400);
+  }
+  function closeChat() {
+    chatOpen = false;
+    undockBot();
+    if (chatPanel) chatPanel.classList.remove('open');
+  }
+  function toggleChat() {
+    if (chatOpen) { closeChat(); } else { openChat(); }
+  }
   function onBotTap(e) {
     if (dragMoved) return;
     if (e) e.stopPropagation();
-    wave();
-    showBubble('Hi!');
+    toggleChat();
   }
 
   // Make the bot itself tappable/clickable. The wrapper stays pass-through so
@@ -242,6 +454,8 @@
     winW = window.innerWidth;
     winH = window.innerHeight;
     if (rInstance) rInstance.resizeDrawingSurfaceToCanvas();
+    if (winW <= MOBILE_BREAK && chatOpen) closeChat();
+    else if (chatOpen && docked) dockBot();
   });
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
