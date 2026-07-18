@@ -935,34 +935,12 @@ body:hover .custom-cursor-circle {
   border-radius: 2px;
 }
 
-/* On phones the bot is small and fixed to the left of the WhatsApp icon
-   at the bottom-right, with idle floating animation only. The chat panel
-   opens directly above the bot with a zoom-in effect. */
+/* On phones the bot is hidden. */
 @media (max-width: 768px) {
   .cool-bot-wrap {
-    width: 100px;
-    height: 100px;
-    right: 75px;
-    bottom: 20px;
-    left: auto;
-    top: auto;
-  }
-  .cool-bot-wrap.chat-open {
-    opacity: 0.85;
+    display: none;
   }
   .cool-bot-chat-panel {
-    right: 20px;
-    bottom: 130px;
-    left: auto;
-    top: auto;
-    width: calc(100vw - 40px);
-    max-width: 320px;
-    max-height: 80vh;
-    overflow-y: auto;
-    transform: translateY(16px) scale(0.8);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-  .cool-bot-chat-panel.open {
-    transform: translateY(0) scale(1);
+    display: none;
   }
 }
