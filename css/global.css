@@ -947,6 +947,9 @@ body:hover .custom-cursor-circle {
     bottom: 20px;
     top: auto;
   }
+  .cool-bot-wrap.chat-open {
+    opacity: 0.85;
+  }
   .cool-bot-chat-panel {
     left: 20px;
     right: auto;
@@ -954,5 +957,7 @@ body:hover .custom-cursor-circle {
     top: auto;
     width: calc(100vw - 40px);
     max-width: 320px;
+    max-height: 80vh;
+    overflow-y: auto;
   }
 }

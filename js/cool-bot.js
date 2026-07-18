@@ -360,6 +360,8 @@
     if (!isMobile) {
       chatPanel.style.left = pl + 'px';
       chatPanel.style.top = pt + 'px';
+    } else {
+      wrap.classList.add('chat-open');
     }
     chatPanel.classList.add('open');
     if (!isMobile) dockBot();
@@ -368,12 +370,15 @@
       addSuggestionChip();
     }
     wave();
-    window.setTimeout(function () { if (chatInputEl) chatInputEl.focus(); }, 400);
+    if (!isMobile) {
+      window.setTimeout(function () { if (chatInputEl) chatInputEl.focus(); }, 400);
+    }
   }
   function closeChat() {
     chatOpen = false;
     undockBot();
     if (chatPanel) chatPanel.classList.remove('open');
+    if (isMobile) wrap.classList.remove('chat-open');
   }
   function toggleChat() {
     if (chatOpen) { closeChat(); } else { openChat(); }
@@ -487,9 +492,15 @@
 
     const cx = pos.x + driftX;
     const cy = pos.y + bob;
-    wrap.style.left = cx.toFixed(2) + 'px';
-    wrap.style.top = cy.toFixed(2) + 'px';
-    wrap.style.transform = `translate(-50%, -50%) rotate(${tilt.toFixed(2)}deg)`;
+    if (!isMobile) {
+      wrap.style.left = cx.toFixed(2) + 'px';
+      wrap.style.top = cy.toFixed(2) + 'px';
+    }
+    if (isMobile && chatOpen) {
+      wrap.style.transform = `translate(-50%, -50%) rotate(${tilt.toFixed(2)}deg) scale(0.7)`;
+    } else {
+      wrap.style.transform = `translate(-50%, -50%) rotate(${tilt.toFixed(2)}deg)`;
+    }
 
     // Relax the look toward center when the pointer is idle (desktop only).
     if (!isMobile && performance.now() - lastMouse > 1200) {
