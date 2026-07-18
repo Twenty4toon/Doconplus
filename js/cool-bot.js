@@ -89,7 +89,7 @@
   let eyeX = 0, eyeY = 0;       // eased parallax for eye-follow illusion
 
   if (isMobile) {
-    target.x = 70;
+    target.x = winW - 125;
     target.y = winH - 70;
     float.x = target.x; float.y = target.y;
     pos.x = target.x; pos.y = target.y;
