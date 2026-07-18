@@ -148,7 +148,6 @@
   .why-digital-card { padding: 24px 14px; }
 
   .services-grid { grid-template-columns: 1fr; }
-  .service-card:nth-child(n+5) { display: none; }
   .service-card { padding: 24px 16px; }
 
   .process-timeline { max-width: 100%; }

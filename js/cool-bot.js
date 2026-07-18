@@ -67,6 +67,9 @@
   const MAX_TILT = 12;            // max degrees the bot leans while moving
   const EYE_PARALLAX = 10;        // px the artboard shifts to fake eye-follow
   const MOBILE_BREAK = 768;       // px width below which we use a tighter offset
+  const TABLET_BREAK = 1024;      // px width below which bot goes to fixed corner
+  const RIGHT_ZONE_WIDTH = 220;   // px — horizontal strip on the right where bot can float
+  const RIGHT_EDGE_OFFSET = 30;   // px from right edge
   const DESKTOP_TRAIL = 0.006;
   const DESKTOP_EASE = 0.009;
 
@@ -75,7 +78,8 @@
   let winH = window.innerHeight;
   const isMobile = winW <= MOBILE_BREAK;
 
-  const target = { x: winW * 0.16, y: winH * 0.55 };   // point the bot aims for
+  const isTablet = winW > MOBILE_BREAK && winW <= TABLET_BREAK;
+  const target = { x: winW - 120, y: winH * 0.55 };     // point the bot aims for
   const float = { x: target.x, y: target.y };          // slow floating trail
   const pos = { x: target.x, y: target.y };            // current bot center
   const look = { x: 0, y: 0 };                         // -1..1 normalized look direction
@@ -85,8 +89,13 @@
   let eyeX = 0, eyeY = 0;       // eased parallax for eye-follow illusion
 
   if (isMobile) {
-    target.x = winW * 0.5;
-    target.y = 40;
+    target.x = 70;
+    target.y = winH - 70;
+    float.x = target.x; float.y = target.y;
+    pos.x = target.x; pos.y = target.y;
+  } else if (isTablet) {
+    target.x = winW - 80;
+    target.y = winH - 80;
     float.x = target.x; float.y = target.y;
     pos.x = target.x; pos.y = target.y;
   }
@@ -164,7 +173,9 @@
     // When docked, skip cursor position tracking (bot stays near chat) but keep look direction
     if (!docked && !isDragging && performance.now() - dragCooldown > DRAG_COOLDOWN_MS) {
       const off = 70;
-      target.x = clamp(x - off, off / 2 + MARGIN, winW - off / 2 - MARGIN);
+      const rightEdge = winW - RIGHT_EDGE_OFFSET;
+      const rightZoneStart = rightEdge - RIGHT_ZONE_WIDTH;
+      target.x = clamp(x, rightZoneStart, rightEdge);
       target.y = clamp(y - off, off / 2 + MARGIN, winH - off / 2 - MARGIN);
     }
 
@@ -316,6 +327,7 @@
     }, 400);
   }
   function dockBot() {
+    if (isMobile) return;
     docked = true;
     if (!chatPanel) return;
     var pr = chatPanel.getBoundingClientRect();
@@ -326,7 +338,6 @@
     docked = false;
   }
   function openChat() {
-    if (isMobile) return;
     buildChatPanel();
     if (chatOpen) return;
     chatOpen = true;
@@ -346,10 +357,12 @@
     }
     pt = clamp(pt, 12, winH - ph - 12);
     pl = clamp(pl, 12, winW - pw - 12);
-    chatPanel.style.left = pl + 'px';
-    chatPanel.style.top = pt + 'px';
+    if (!isMobile) {
+      chatPanel.style.left = pl + 'px';
+      chatPanel.style.top = pt + 'px';
+    }
     chatPanel.classList.add('open');
-    dockBot();
+    if (!isMobile) dockBot();
     if (chatMessages.children.length === 0) {
       addBotMessage("Hey there! \uD83D\uDC4B I'm the Docon+ assistant. Ask me anything about Docon+!");
       addSuggestionChip();
@@ -379,40 +392,10 @@
   canvas.addEventListener('click', onBotTap);
 
   if (isMobile) {
-    // Combined drag + tap for mobile
-    let touchStartX = 0, touchStartY = 0;
-
     canvas.addEventListener('touchstart', (e) => {
-      const t = e.touches[0];
-      touchStartX = t.clientX;
-      touchStartY = t.clientY;
-      dragMoved = false;
-      isDragging = true;
-      dragOffX = t.clientX - pos.x;
-      dragOffY = t.clientY - pos.y;
-    }, { passive: true });
-
-    canvas.addEventListener('touchmove', (e) => {
-      if (!isDragging) return;
-      const t = e.touches[0];
-      if (Math.abs(t.clientX - touchStartX) > 8 || Math.abs(t.clientY - touchStartY) > 8) {
-        dragMoved = true;
-      }
-      const nx = clamp(t.clientX - dragOffX, winW * 0.15, winW * 0.85);
-      const ny = clamp(t.clientY - dragOffY, 35, 60);
-      target.x = nx;
-      target.y = ny;
-      float.x = nx;
-      float.y = ny;
       e.preventDefault();
+      onBotTap(e);
     }, { passive: false });
-
-    canvas.addEventListener('touchend', () => {
-      isDragging = false;
-      if (!dragMoved) onBotTap();
-    });
-
-    canvas.addEventListener('touchcancel', () => { isDragging = false; });
   } else {
     canvas.addEventListener('touchstart', (e) => { e.preventDefault(); onBotTap(e); }, { passive: false });
 
@@ -434,7 +417,9 @@
       if (Math.abs(e.clientX - mouseStartX) > 8 || Math.abs(e.clientY - mouseStartY) > 8) {
         dragMoved = true;
       }
-      const nx = clamp(e.clientX - dragOffX, MARGIN + 50, winW - MARGIN - 50);
+      const rightEdge = winW - RIGHT_EDGE_OFFSET;
+      const rightZoneStart = rightEdge - RIGHT_ZONE_WIDTH;
+      const nx = clamp(e.clientX - dragOffX, rightZoneStart, rightEdge);
       const ny = clamp(e.clientY - dragOffY, MARGIN + 50, winH - MARGIN - 50);
       target.x = nx;
       target.y = ny;
@@ -474,20 +459,10 @@
     pos.x += (float.x - pos.x) * ease;
     pos.y += (float.y - pos.y) * ease;
 
-    // ---- Mobile: drift between logo and hamburger in navbar ----
+    // ---- Mobile: no patrol drift, bot stays fixed bottom-left ----
     if (isMobile && !isDragging) {
-      target.x += (winW * 0.5 + Math.sin(patrolT * 0.4) * 20 - target.x) * 0.008;
-      target.x = clamp(target.x, winW * 0.28, winW * 0.72);
-
-      autoGazeT += 0.016;
-      if (autoGazeT > nextGazeChange) {
-        autoGazeT = 0;
-        nextGazeChange = 2 + Math.random() * 4;
-        autoGazeX = (Math.random() - 0.5) * 1.2;
-        autoGazeY = (Math.random() - 0.5) * 0.8;
-      }
-      lookTarget.x += (autoGazeX - lookTarget.x) * 0.015;
-      lookTarget.y += (autoGazeY - lookTarget.y) * 0.015;
+      lookTarget.x += (0 - lookTarget.x) * 0.02;
+      lookTarget.y += (0 - lookTarget.y) * 0.02;
     }
 
     // Ease eyes/head direction.

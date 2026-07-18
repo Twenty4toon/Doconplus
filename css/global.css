@@ -131,20 +131,15 @@ i.ph {
 
 .btn-outline {
   display: inline-flex; align-items: center; gap: 8px;
-  background: var(--grad); color: #fff; font-family: 'Outfit', sans-serif;
-  font-weight: 700; font-size: 1rem; padding: 14px 32px;
-  border-radius: 50px; border: none; cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 24px rgba(0,105,255,0.4);
-  position: relative; overflow: hidden;
+  background: transparent; color: #fff; font-family: 'Outfit', sans-serif;
+  font-weight: 700; font-size: 1rem; padding: 13px 31px;
+  border-radius: 50px; border: 2px solid rgba(255,255,255,0.25); cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
-.btn-outline::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
-  transform: translateX(-100%); transition: transform 0.6s;
+.btn-outline:hover {
+  background: rgba(255,255,255,0.08); border-color: #fff;
+  transform: translateY(-2px); box-shadow: 0 4px 16px rgba(255,255,255,0.1);
 }
-.btn-outline:hover::after { transform: translateX(100%); }
-.btn-outline:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,200,255,0.45); }
 .btn-full { width: 100%; justify-content: center; }
 
 .pulse-btn { animation: pulse-glow 2.5s ease-in-out infinite; }
@@ -710,8 +705,8 @@ body:hover .custom-cursor-circle {
   position: fixed;
   width: 150px;
   height: 150px;
-  left: 16%;
-  top: 55%;
+  right: 30px;
+  bottom: 30px;
   transform: translate(-50%, -50%);
   z-index: 950;
   pointer-events: none;
@@ -940,9 +935,24 @@ body:hover .custom-cursor-circle {
   border-radius: 2px;
 }
 
-/* On phones the bot is small and patrols the bottom edge (set from JS) so it
-   flies above the text instead of lingering over it. */
+/* On phones the bot is small and fixed to the bottom-left corner with idle
+   floating animation only. It stays above the text and the chat panel opens
+   directly above it. */
 @media (max-width: 768px) {
-  .cool-bot-wrap { display: none; }
-  .cool-bot-chat-panel { display: none; }
+  .cool-bot-wrap {
+    width: 100px;
+    height: 100px;
+    left: 20px;
+    right: auto;
+    bottom: 20px;
+    top: auto;
+  }
+  .cool-bot-chat-panel {
+    left: 20px;
+    right: auto;
+    bottom: 130px;
+    top: auto;
+    width: calc(100vw - 40px);
+    max-width: 320px;
+  }
 }

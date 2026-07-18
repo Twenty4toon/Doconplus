@@ -61,13 +61,19 @@
 /* Category filter */
 .blog-categories { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 48px; }
 .blog-cat-btn {
-  background: var(--grad); color: #fff; padding: 8px 22px; border-radius: 50px;
-  border: none; font-family: 'Outfit', sans-serif; font-size: 0.88rem; font-weight: 600;
-  cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 16px rgba(0,105,255,0.3);
+  background: transparent; color: var(--blue); padding: 7px 21px; border-radius: 50px;
+  border: 2px solid rgba(0,105,255,0.2); font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem; font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
-.blog-cat-btn:hover, .blog-cat-btn.active {
-  transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,200,255,0.4);
+.blog-cat-btn:hover {
+  background: rgba(0,105,255,0.08); border-color: var(--blue);
+  transform: translateY(-1px);
+}
+.blog-cat-btn.active {
+  background: var(--grad); color: #fff; border-color: transparent;
+  box-shadow: 0 4px 16px rgba(0,105,255,0.3);
 }
 
 @media (max-width: 1024px) {
